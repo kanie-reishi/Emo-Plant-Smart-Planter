@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kế hoạch Triển khai: Thuật toán AI & Web Demo cho Smart Planter AI</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --emerald: #10b981;
+            --emerald-dark: #059669;
+            --surface: #1e1e1e;
+            --border: #333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1, h2, h3, h4 {
+            color: var(--emerald);
+        }
+        h1 { border-bottom: 2px solid var(--emerald-dark); padding-bottom: 10px; }
+        h2 { border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-top: 30px; }
+        .alert {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid var(--emerald);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        ul { padding-left: 20px; }
+        code {
+            background-color: var(--surface);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #ffb86c;
+            font-family: Consolas, monospace;
+        }
+        pre {
+            background-color: var(--surface);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            border: 1px solid var(--border);
+        }
+        .tag-new {
+            background-color: var(--emerald-dark);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-right: 8px;
+        }
+        hr { border: 0; height: 1px; background-color: var(--border); margin: 30px 0; }
+    </style>
+</head>
+<body>
+
+    <h1>Kế hoạch Triển khai: Thuật toán AI & Web Demo cho Smart Planter AI</h1>
+    <p>Dựa trên bối cảnh hệ thống và các quyết định kỹ thuật chúng ta đã thống nhất qua quá trình trao đổi, dưới đây là kế hoạch chi tiết để xây dựng thuật toán AI nhận diện bệnh và Web Demo.</p>
+
+    <h2>Mấu chốt kỹ thuật đã thống nhất</h2>
+    <ul>
+        <li><strong>Mô hình AI</strong>: Phân loại ảnh (Image Classification) bằng kiến trúc <strong>MobileNetV2</strong>. Huấn luyện thực hiện trên máy khác, máy local chỉ chạy inference.</li>
+        <li><strong>Dữ liệu</strong>: Bộ dữ liệu chuẩn <strong>PlantVillage</strong>.</li>
+        <li><strong>Frontend</strong>: <strong>React + Vite</strong> kết hợp Vanilla CSS (Tập trung vào thẩm mỹ cao, Glassmorphism, Micro-animations, tone màu chủ đạo Emerald + Dark Mode).</li>
+        <li><strong>Backend</strong>: <strong>Python FastAPI</strong> đóng vai trò là API Gateway xử lý ảnh.</li>
+        <li><strong>Workflow</strong>: Triển khai toàn bộ luồng Full-stack (Frontend -> Backend -> Mock Model / Pre-trained Model) để thông pipeline.</li>
+    </ul>
+
+    <h2>Chi tiết Triển khai</h2>
+
+    <h3>1. Khởi tạo & Cấu trúc Thư mục Tổng thể</h3>
+    <p>Tạo cấu trúc thư mục rõ ràng phân tách giữa Frontend và Backend trong dự án.</p>
+    <ul>
+        <li><span class="tag-new">NEW</span> <code>backend/</code>: Thư mục chứa mã nguồn Python FastAPI và các script AI.</li>
+        <li><span class="tag-new">NEW</span> <code>web-demo/</code>: Thư mục chứa ứng dụng React Vite.</li>
+    </ul>
+
+    <hr>
+
+    <h3>2. Backend & AI Pipeline (Python FastAPI)</h3>
+    <p>Chúng ta sẽ dựng một server FastAPI siêu tốc độ, nhận file ảnh gửi lên, tiền xử lý và trả về kết quả chuẩn đoán.</p>
+    <ul>
+        <li><span class="tag-new">NEW</span> <code>backend/requirements.txt</code>: Chứa các thư viện cần thiết: fastapi, uvicorn, python-multipart, Pillow, torch, torchvision, numpy.</li>
+        <li><span class="tag-new">NEW</span> <code>backend/main.py</code>: Khởi tạo FastAPI app. Cấu hình CORS. Định nghĩa endpoint POST <code>/predict</code>.</li>
+        <li><span class="tag-new">NEW</span> <code>backend/ai_model.py</code>: Module chứa logic nạp mô hình MobileNetV2. Hàm <code>predict_image()</code> sẽ trả về kết quả (tạm thời sử dụng dữ liệu giả lập cho đến khi nạp model huấn luyện xong).</li>
+        <li><span class="tag-new">NEW</span> <code>backend/train_mobilenet.py</code>: Script huấn luyện pipeline với PlantVillage dataset. (Script này sẽ được viết sẵn để bạn mang sang máy khác chạy).</li>
+    </ul>
+
+    <hr>
+
+    <h3>3. Frontend Web Demo (React + Vite + Vanilla CSS)</h3>
+    <p>Xây dựng một giao diện <strong>Wow</strong> cho người dùng, sử dụng Glassmorphism và chuyển động mượt mà.</p>
+    <ul>
+        <li><span class="tag-new">NEW</span> <code>web-demo/package.json</code> & Cấu hình Vite.</li>
+        <li><span class="tag-new">NEW</span> <code>web-demo/src/index.css</code>: Định nghĩa Design System Dark Mode + Emerald Green, hiệu ứng Glassmorphism.</li>
+        <li><span class="tag-new">NEW</span> <code>web-demo/src/App.jsx</code>: Layout chính, quản lý State ảnh upload.</li>
+        <li><span class="tag-new">NEW</span> <code>web-demo/src/components/ImageUploader.jsx</code>: Vùng Drag & Drop tải ảnh lên.</li>
+        <li><span class="tag-new">NEW</span> <code>web-demo/src/components/PredictionResult.jsx</code>: Thẻ hiển thị kết quả chẩn đoán với hiệu ứng mượt mà.</li>
+    </ul>
+
+</body>
+</html>

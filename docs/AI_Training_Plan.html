@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Kế hoạch Triển khai AI Model - Smart Planter AI</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 20px; color: #333; max-width: 900px; margin: 0 auto; padding: 20px;}
+        h1, h2, h3 { color: #2c3e50; }
+        .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; }
+        .alert-info { color: #31708f; background-color: #d9edf7; border-color: #bce8f1; }
+        .alert-warning { color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; }
+        .code { background-color: #f9f2f4; color: #c7254e; padding: 2px 4px; border-radius: 4px; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Kế hoạch Triển khai AI Model - Smart Planter AI</h1>
+    <p>Dựa trên tài liệu đặc tả hệ thống và mã nguồn hiện có, dưới đây là kế hoạch chi tiết để thay thế Mock Model bằng AI Model thực tế (MobileNetV2 huấn luyện trên tập PlantVillage).</p>
+
+    <div class="alert alert-info">
+        <strong>Thông tin phần cứng & dữ liệu (Cập nhật từ phản hồi của bạn):</strong>
+        <ul>
+            <li><strong>Dữ liệu PlantVillage:</strong> Dung lượng tải về dự kiến khoảng <strong>800MB (file nén)</strong> và sau khi giải nén sẽ chiếm khoảng <strong>1.5GB - 2GB</strong> dung lượng ổ cứng.</li>
+            <li><strong>Phần cứng:</strong> Sử dụng GPU <strong>RTX 3050</strong> (sẽ giúp tăng tốc độ huấn luyện lên đáng kể nhờ CUDA so với CPU, cấu hình này đủ để train MobileNetV2).</li>
+            <li><strong>Độ trễ (Latency):</strong> Chưa cần tối ưu UX ở giai đoạn này.</li>
+        </ul>
+    </div>
+
+    <div class="alert alert-warning">
+        <strong>Chiến lược Transfer Learning cho Cây Cảnh (Indoor Plants):</strong>
+        <p>Mục tiêu của dự án là nhận diện sức khỏe cây cảnh, nhưng ta sẽ dùng phương pháp Học chuyển giao 2 giai đoạn:</p>
+        <ol>
+            <li><strong>Giai đoạn 1 (Pre-training):</strong> Huấn luyện model trên tập PlantVillage (cây nông nghiệp) để học các đặc trưng thị giác cơ bản của lá cây và vết bệnh.</li>
+            <li><strong>Giai đoạn 2 (Fine-tuning):</strong> Dùng một tập dữ liệu nhỏ chuyên về cây cảnh (Monstera, Trầu bà...) có các biểu hiện stress để tinh chỉnh lại mô hình.</li>
+        </ol>
+    </div>
+
+    <h2>1. Chuẩn bị Dữ liệu (Dataset Preparation)</h2>
+    <p>Do chưa có sẵn dữ liệu, quá trình sẽ bao gồm việc cung cấp script tải dataset PlantVillage, sau đó tổ chức thành:</p>
+    <ul>
+        <li><span class="code">backend/dataset/train</span></li>
+        <li><span class="code">backend/dataset/val</span></li>
+    </ul>
+
+    <h2>2. Tạo File Ánh xạ (Class Mapping)</h2>
+    <p>Agent sẽ tự động sinh file JSON/Dict ánh xạ 38 loại bệnh từ ID của PlantVillage sang tên tiếng Việt thân thiện kèm theo lời khuyên chăm sóc cho từng loại bệnh (ví dụ: Bệnh sương mai, Đốm vi khuẩn, Khỏe mạnh...).</p>
+
+    <h2>3. Huấn luyện Mô hình (Model Training)</h2>
+    <ul>
+        <li>Thực thi file <span class="code">train_mobilenet.py</span>. PyTorch sẽ tự động phát hiện và dùng GPU RTX 3050.</li>
+        <li>Quá trình sẽ tận dụng kiến trúc MobileNetV2, CrossEntropyLoss, Adam Optimizer và Data Augmentation.</li>
+        <li>Kết quả đầu ra là file trọng số: <span class="code">mobilenetv2_plantvillage.pth</span>.</li>
+    </ul>
+
+    <h2>4. Tích hợp Model vào FastAPI (Backend Inference)</h2>
+    <p>Thay thế logic Mock bằng Inference thực sự với PyTorch trong <span class="code">backend/ai_model.py</span>:</p>
+    <ul>
+        <li>Khởi tạo kiến trúc <span class="code">models.mobilenet_v2()</span> và thay đổi lớp classifier cuối cùng cho 38 classes.</li>
+        <li>Nạp trọng số từ file <span class="code">mobilenetv2_plantvillage.pth</span>.</li>
+        <li>Áp dụng luồng xử lý ảnh tương đương với tập validation lúc training (Resize -> CenterCrop -> ToTensor -> Normalize).</li>
+        <li>Dự đoán và trả kết quả dự đoán kèm mức độ tin cậy.</li>
+    </ul>
+
+    <h2>5. Kế hoạch Kiểm thử (Verification Plan)</h2>
+    <ul>
+        <li><strong>Automated:</strong> Gửi request POST lên endpoint <span class="code">/predict</span> bằng một vài ảnh mẫu qua <code>curl</code> hoặc Python script.</li>
+        <li><strong>Manual:</strong> Sử dụng giao diện Swagger UI (<span class="code">http://localhost:8000/docs</span>) tải ảnh thật và kiểm tra bằng mắt thường.</li>
+    </ul>
+</body>
+</html>

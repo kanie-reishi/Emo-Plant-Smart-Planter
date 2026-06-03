@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kế hoạch Web Dashboard - Smart Planter AI</title>
+    <style>
+        :root {
+            --primary: #2D6A4F;
+            --primary-light: #52B788;
+            --primary-pale: #D8F3DC;
+            --bg: #FAFAF5;
+            --surface: #FFFFFF;
+            --text: #1B4332;
+            --text-secondary: #6B7280;
+            --danger: #DC2626;
+            --warning: #F59E0B;
+            --info-bg: #d9edf7;
+            --info-border: #bce8f1;
+            --info-text: #31708f;
+            --warning-bg: #fcf8e3;
+            --warning-border: #faebcc;
+            --warning-text: #8a6d3b;
+            --danger-bg: #f2dede;
+            --danger-border: #ebccd1;
+            --danger-text: #a94442;
+            --success-bg: #dff0d8;
+            --success-border: #d6e9c6;
+            --success-text: #3c763d;
+            --border: #E5E7EB;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--text);
+            background: var(--bg);
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary-light);
+            padding-bottom: 10px;
+        }
+
+        h1 .emoji { font-size: 1.8rem; }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: var(--primary);
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            padding-left: 12px;
+            border-left: 4px solid var(--primary-light);
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            color: #374151;
+            margin-top: 1.5rem;
+            margin-bottom: 0.6rem;
+        }
+
+        p { margin-bottom: 0.8rem; }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 1.8rem;
+        }
+
+        li { margin-bottom: 0.4rem; }
+
+        .alert {
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+
+        .alert-info { color: var(--info-text); background-color: var(--info-bg); border-color: var(--info-border); }
+        .alert-warning { color: var(--warning-text); background-color: var(--warning-bg); border-color: var(--warning-border); }
+        .alert-danger { color: var(--danger-text); background-color: var(--danger-bg); border-color: var(--danger-border); }
+        .alert-success { color: var(--success-text); background-color: var(--success-bg); border-color: var(--success-border); }
+
+        .alert strong { display: block; margin-bottom: 6px; }
+
+        .code {
+            background-color: #f3f4f6;
+            color: #9333ea;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            padding: 16px 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) { background-color: #f9fafb; }
+        tr:hover { background-color: var(--primary-pale); }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge-new { background: var(--primary-pale); color: var(--primary); }
+        .badge-modify { background: #FEF3C7; color: #92400E; }
+        .badge-keep { background: #E5E7EB; color: #6B7280; }
+        .badge-rewrite { background: #FEE2E2; color: #991B1B; }
+        .badge-phase { background: #EDE9FE; color: #6D28D9; }
+
+        .module-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 16px;
+            transition: box-shadow 0.2s;
+        }
+
+        .module-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+        .module-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .schema-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 1rem;
+        }
+
+        .schema-box h4 {
+            margin: 0 0 8px 0;
+            color: var(--primary);
+            font-size: 1rem;
+        }
+
+        .color-swatch {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin-right: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .phase-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            margin-top: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .phase-header h2 {
+            color: white;
+            margin: 0;
+            border: none;
+            padding: 0;
+        }
+
+        .phase-header p {
+            margin: 4px 0 0 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+        }
+
+        .file-tree {
+            background: #1e293b;
+            color: #94a3b8;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Cascadia Code', Consolas, monospace;
+            font-size: 0.85rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-tree .new { color: #4ade80; }
+        .file-tree .modify { color: #fbbf24; }
+        .file-tree .keep { color: #94a3b8; }
+        .file-tree .rewrite { color: #f87171; }
+        .file-tree .folder { color: #60a5fa; }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 2rem 0;
+        }
+
+        .nav-diagram {
+            background: var(--surface);
+            border: 2px solid var(--primary-pale);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-family: 'Cascadia Code', Consolas, monospace;
+            font-size: 0.9rem;
+            line-height: 2;
+        }
+
+        .toc {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px 28px;
+            margin-bottom: 2rem;
+        }
+
+        .toc h3 { margin-top: 0; color: var(--primary); }
+        .toc ol { margin-bottom: 0; }
+        .toc a { color: var(--primary); text-decoration: none; }
+        .toc a:hover { text-decoration: underline; }
+
+        .checklist {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .checklist li {
+            padding: 6px 0 6px 28px;
+            position: relative;
+        }
+
+        .checklist li::before {
+            content: '☐';
+            position: absolute;
+            left: 0;
+            font-size: 1.1rem;
+        }
+
+        footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <h1><span class="emoji">🌿</span> Kế hoạch Web Dashboard — Smart Planter AI</h1>
+    <p class="subtitle">
+        Xây dựng hệ thống web Dashboard theo dõi sức khỏe cây cảnh từ chậu cây thông minh ESP32-CAM.<br>
+        Nâng cấp từ bản demo upload ảnh thành một dashboard hoàn chỉnh với phong cách Nature Minimal.
+    </p>
+
+    <!-- Table of Contents -->
+    <div class="toc">
+        <h3>📑 Mục lục</h3>
+        <ol>
+            <li><a href="#decisions">Tổng hợp các quyết định thiết kế</a></li>
+            <li><a href="#phase1">Phase 1 — Web Dashboard + Backend API (Mock Data)</a>
+                <ol>
+                    <li><a href="#module1">Module 1: Backend Database & Models</a></li>
+                    <li><a href="#module2">Module 2: Backend API Routers</a></li>
+                    <li><a href="#module3">Module 3: Mock Data Generator</a></li>
+                    <li><a href="#module4">Module 4: Firebase Auth Integration</a></li>
+                    <li><a href="#module5">Module 5: Frontend Design System & Layout</a></li>
+                    <li><a href="#module6">Module 6: Dashboard Page</a></li>
+                    <li><a href="#module7">Module 7: Charts Page</a></li>
+                    <li><a href="#module8">Module 8: Camera & AI Page</a></li>
+                    <li><a href="#module9">Module 9: History Page</a></li>
+                    <li><a href="#module10">Module 10: Alerts & Settings Pages</a></li>
+                    <li><a href="#module11">Module 11: Firebase Cloud Messaging</a></li>
+                </ol>
+            </li>
+            <li><a href="#phase2">Phase 2 — ESP32-CAM Integration</a></li>
+            <li><a href="#file-tree">Cấu trúc thư mục cuối cùng</a></li>
+            <li><a href="#verification">Kế hoạch kiểm thử</a></li>
+        </ol>
+    </div>
+
+    <!-- Alerts -->
+    <div class="alert alert-danger">
+        <strong>⚠️ Thiết kế lại giao diện hoàn toàn</strong>
+        Phong cách Nature Minimal sẽ thay thế dark glassmorphism hiện tại. Code trong <span class="code">web-demo/src/</span> sẽ được refactor lại toàn bộ component structure.
+    </div>
+
+    <div class="alert alert-warning">
+        <strong>🔌 Thêm cảm biến phần cứng</strong>
+        Kế hoạch giả định ESP32-CAM sẽ kết nối thêm: DHT22 (nhiệt độ + độ ẩm không khí), BH1750/LDR (ánh sáng), Water Level Sensor (mực nước bồn). Phase 1 dùng mock data, Phase 2 mới cần phần cứng thật.
+    </div>
+
+    <div class="alert alert-info">
+        <strong>🔥 Firebase Services</strong>
+        Plan sử dụng Firebase Auth (Google login) + Firebase Cloud Messaging (push notification). Cần tạo Firebase project và cấu hình credentials trước khi triển khai Module 4 và Module 11.
+    </div>
+
+    <!-- Section 1: Decisions -->
+    <h2 id="decisions">1. Tổng hợp các quyết định thiết kế</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Hạng mục</th>
+                <th>Quyết định</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td>Phạm vi</td><td>Dashboard cá nhân, 1 chậu cây duy nhất</td></tr>
+            <tr><td>Frontend</td><td>Vite + React 19 (giữ nguyên) + React Router + Recharts</td></tr>
+            <tr><td>Backend</td><td>FastAPI (giữ nguyên) + SQLAlchemy + SQLite</td></tr>
+            <tr><td>Giao thức device</td><td>HTTP REST (sensor data) + MJPEG stream (camera)</td></tr>
+            <tr><td>Database</td><td>SQLite (file-based)</td></tr>
+            <tr><td>Authentication</td><td>Firebase Auth (Google OAuth)</td></tr>
+            <tr><td>Notification</td><td>Firebase Cloud Messaging (push notification)</td></tr>
+            <tr><td>UI Theme</td><td>Nature Minimal — nền trắng kem, xanh lá gradient, bo tròn</td></tr>
+            <tr><td>Ngôn ngữ</td><td>UI tiếng Việt, code/comment tiếng Anh</td></tr>
+            <tr><td>Lộ trình</td><td>Phase 1: Web + mock data → Phase 2: ESP32 thật</td></tr>
+        </tbody>
+    </table>
+
+    <h3>🎨 Bảng màu Nature Minimal</h3>
+    <table>
+        <thead>
+            <tr><th>Tên</th><th>Mã màu</th><th>Xem trước</th><th>Sử dụng cho</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Background</td><td><span class="code">#FAFAF5</span></td><td><span class="color-swatch" style="background:#FAFAF5"></span></td><td>Nền chính</td></tr>
+            <tr><td>Surface</td><td><span class="code">#FFFFFF</span></td><td><span class="color-swatch" style="background:#FFFFFF"></span></td><td>Card, panel</td></tr>
+            <tr><td>Primary</td><td><span class="code">#2D6A4F</span></td><td><span class="color-swatch" style="background:#2D6A4F"></span></td><td>Màu chủ đạo (forest green)</td></tr>
+            <tr><td>Primary Light</td><td><span class="code">#52B788</span></td><td><span class="color-swatch" style="background:#52B788"></span></td><td>Gradient, hover</td></tr>
+            <tr><td>Primary Pale</td><td><span class="code">#D8F3DC</span></td><td><span class="color-swatch" style="background:#D8F3DC"></span></td><td>Badge, highlight nhẹ</td></tr>
+            <tr><td>Secondary</td><td><span class="code">#74C69D</span></td><td><span class="color-swatch" style="background:#74C69D"></span></td><td>Biểu đồ phụ</td></tr>
+            <tr><td>Text Primary</td><td><span class="code">#1B4332</span></td><td><span class="color-swatch" style="background:#1B4332"></span></td><td>Chữ chính</td></tr>
+            <tr><td>Text Secondary</td><td><span class="code">#6B7280</span></td><td><span class="color-swatch" style="background:#6B7280"></span></td><td>Chữ phụ, label</td></tr>
+            <tr><td>Danger</td><td><span class="code">#DC2626</span></td><td><span class="color-swatch" style="background:#DC2626"></span></td><td>Bệnh, lỗi</td></tr>
+            <tr><td>Warning</td><td><span class="code">#F59E0B</span></td><td><span class="color-swatch" style="background:#F59E0B"></span></td><td>Cảnh báo</td></tr>
+            <tr><td>Success</td><td><span class="code">#059669</span></td><td><span class="color-swatch" style="background:#059669"></span></td><td>Khỏe mạnh, thành công</td></tr>
+            <tr><td>Water Blue</td><td><span class="code">#0EA5E9</span></td><td><span class="color-swatch" style="background:#0EA5E9"></span></td><td>Mực nước, tưới</td></tr>
+        </tbody>
+    </table>
+
+    <!-- Phase 1 -->
+    <div class="phase-header" id="phase1">
+        <h2>Phase 1 — Web Dashboard + Backend API (Mock Data)</h2>
+        <p>Xây dựng hoàn chỉnh Frontend + Backend API với dữ liệu giả lập, không cần ESP32 thật.</p>
+    </div>
+
+    <!-- Module 1 -->
+    <div class="module-card" id="module1">
+        <h3>📦 Module 1: Backend Database & Models</h3>
+        <p>Thiết lập SQLite database với SQLAlchemy ORM.</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Mô tả</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">backend/database.py</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>SQLAlchemy engine + session factory cho SQLite</td>
+                </tr>
+                <tr>
+                    <td><span class="code">backend/models.py</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Định nghĩa tất cả DB models (5 bảng)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Database Schema</h4>
+
+        <div class="schema-box">
+            <h4>📊 sensor_readings</h4>
+            <table>
+                <thead><tr><th>Cột</th><th>Kiểu</th><th>Mô tả</th></tr></thead>
+                <tbody>
+                    <tr><td>id</td><td>Integer (PK)</td><td>Primary key</td></tr>
+                    <tr><td>timestamp</td><td>DateTime</td><td>Thời điểm đo</td></tr>
+                    <tr><td>soil_moisture</td><td>Float</td><td>% độ ẩm đất</td></tr>
+                    <tr><td>temperature</td><td>Float</td><td>°C nhiệt độ không khí</td></tr>
+                    <tr><td>humidity</td><td>Float</td><td>% độ ẩm không khí</td></tr>
+                    <tr><td>light_level</td><td>Float</td><td>Lux ánh sáng</td></tr>
+                    <tr><td>water_level</td><td>Float</td><td>% mực nước bồn chứa</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="schema-box">
+            <h4>🔬 ai_diagnoses</h4>
+            <table>
+                <thead><tr><th>Cột</th><th>Kiểu</th><th>Mô tả</th></tr></thead>
+                <tbody>
+                    <tr><td>id</td><td>Integer (PK)</td><td>Primary key</td></tr>
+                    <tr><td>timestamp</td><td>DateTime</td><td>Thời điểm chẩn đoán</td></tr>
+                    <tr><td>image_path</td><td>String</td><td>Đường dẫn file ảnh đã lưu</td></tr>
+                    <tr><td>disease_name</td><td>String</td><td>Tên bệnh phát hiện</td></tr>
+                    <tr><td>confidence</td><td>Float</td><td>Mức độ tin cậy (0-1)</td></tr>
+                    <tr><td>recommendation</td><td>String</td><td>Lời khuyên chăm sóc</td></tr>
+                    <tr><td>is_healthy</td><td>Boolean</td><td>Cây có khỏe không</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="schema-box">
+            <h4>💧 watering_history</h4>
+            <table>
+                <thead><tr><th>Cột</th><th>Kiểu</th><th>Mô tả</th></tr></thead>
+                <tbody>
+                    <tr><td>id</td><td>Integer (PK)</td><td>Primary key</td></tr>
+                    <tr><td>timestamp</td><td>DateTime</td><td>Thời điểm tưới</td></tr>
+                    <tr><td>trigger_type</td><td>String</td><td>"auto" | "manual" | "remote"</td></tr>
+                    <tr><td>duration_seconds</td><td>Integer</td><td>Thời gian bơm (giây)</td></tr>
+                    <tr><td>soil_moisture_before</td><td>Float</td><td>Độ ẩm trước khi tưới</td></tr>
+                    <tr><td>soil_moisture_after</td><td>Float</td><td>Độ ẩm sau khi tưới</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="schema-box">
+            <h4>🔔 alerts</h4>
+            <table>
+                <thead><tr><th>Cột</th><th>Kiểu</th><th>Mô tả</th></tr></thead>
+                <tbody>
+                    <tr><td>id</td><td>Integer (PK)</td><td>Primary key</td></tr>
+                    <tr><td>timestamp</td><td>DateTime</td><td>Thời điểm cảnh báo</td></tr>
+                    <tr><td>alert_type</td><td>String</td><td>"low_moisture" | "disease" | "low_water" | "high_temp"</td></tr>
+                    <tr><td>message</td><td>String</td><td>Nội dung cảnh báo</td></tr>
+                    <tr><td>severity</td><td>String</td><td>"info" | "warning" | "critical"</td></tr>
+                    <tr><td>is_read</td><td>Boolean</td><td>Đã đọc chưa</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="schema-box">
+            <h4>⚙️ plant_settings</h4>
+            <table>
+                <thead><tr><th>Cột</th><th>Kiểu</th><th>Mô tả</th></tr></thead>
+                <tbody>
+                    <tr><td>id</td><td>Integer (PK)</td><td>Primary key</td></tr>
+                    <tr><td>plant_name</td><td>String</td><td>Tên cây (VD: "Sen Đá Lulu")</td></tr>
+                    <tr><td>plant_type</td><td>String</td><td>Loại cây</td></tr>
+                    <tr><td>moisture_threshold_low</td><td>Float</td><td>Ngưỡng tưới tự động (%)</td></tr>
+                    <tr><td>moisture_threshold_high</td><td>Float</td><td>Ngưỡng dừng tưới (%)</td></tr>
+                    <tr><td>capture_interval_hours</td><td>Integer</td><td>Tần suất chụp ảnh AI (giờ)</td></tr>
+                    <tr><td>auto_water_enabled</td><td>Boolean</td><td>Bật/tắt tưới tự động</td></tr>
+                    <tr><td>alert_enabled</td><td>Boolean</td><td>Bật/tắt cảnh báo</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Module 2 -->
+    <div class="module-card" id="module2">
+        <h3>🔌 Module 2: Backend API Routers</h3>
+        <p>Tạo các API endpoint mới cho Dashboard, tổ chức theo router riêng biệt.</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Endpoints</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">backend/routers/sensor.py</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>
+                        <span class="code">POST /api/sensor</span> — ESP32 gửi data lên<br>
+                        <span class="code">GET /api/sensor/latest</span> — Data mới nhất<br>
+                        <span class="code">GET /api/sensor/history</span> — Lịch sử cho biểu đồ
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="code">backend/routers/diagnosis.py</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>
+                        <span class="code">POST /api/diagnose</span> — Upload ảnh + AI<br>
+                        <span class="code">GET /api/diagnose/history</span> — Lịch sử chẩn đoán<br>
+                        <span class="code">GET /api/diagnose/{id}</span> — Chi tiết 1 lần
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="code">backend/routers/control.py</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>
+                        <span class="code">POST /api/pump/toggle</span> — Bật/tắt bơm<br>
+                        <span class="code">GET /api/pump/status</span> — Trạng thái bơm<br>
+                        <span class="code">GET /api/watering/history</span> — Lịch sử tưới
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="code">backend/routers/alerts.py</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>
+                        <span class="code">GET /api/alerts</span> — Danh sách cảnh báo<br>
+                        <span class="code">PATCH /api/alerts/{id}/read</span> — Đánh dấu đã đọc<br>
+                        <span class="code">GET /api/alerts/unread-count</span> — Đếm chưa đọc
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="code">backend/routers/settings.py</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>
+                        <span class="code">GET /api/settings</span> — Lấy cài đặt<br>
+                        <span class="code">PUT /api/settings</span> — Cập nhật cài đặt
+                    </td>
+                </tr>
+                <tr>
+                    <td><span class="code">backend/main.py</span></td>
+                    <td><span class="badge badge-modify">MODIFY</span></td>
+                    <td>Thêm router includes, DB init on startup, static files serving</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Module 3 -->
+    <div class="module-card" id="module3">
+        <h3>🎲 Module 3: Mock Data Generator</h3>
+        <p>Script Python chạy nền, sinh dữ liệu sensor giả lập để test Dashboard mà không cần ESP32 thật.</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Mô tả</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">backend/mock_generator.py</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>
+                        Mỗi 30s insert 1 record vào <span class="code">sensor_readings</span><br>
+                        • Độ ẩm giảm dần, tăng vọt khi "tưới"<br>
+                        • Nhiệt độ dao động 25-35°C<br>
+                        • Ánh sáng theo chu kỳ ngày/đêm (sin wave)<br>
+                        • Mực nước giảm dần sau mỗi lần tưới<br>
+                        • Tự tạo alert khi sensor vượt ngưỡng
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Module 4 -->
+    <div class="module-card" id="module4">
+        <h3>🔐 Module 4: Firebase Auth Integration</h3>
+        <p>Tích hợp đăng nhập Google vào cả Backend (verify token) và Frontend (Google Sign-In UI).</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Mô tả</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">backend/firebase_auth.py</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Middleware verify Firebase ID token từ Authorization header</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/firebase.js</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Firebase config + Auth + Messaging initialization</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/pages/LoginPage.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Trang đăng nhập với nút "Đăng nhập bằng Google"</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/ProtectedRoute.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>HOC kiểm tra auth trước khi render page</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="alert alert-warning">
+            <strong>Yêu cầu trước khi triển khai:</strong>
+            Cần tạo Firebase Project tại <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a>, bật Authentication > Google provider, và lấy config keys.
+        </div>
+    </div>
+
+    <!-- Module 5 -->
+    <div class="module-card" id="module5">
+        <h3>🎨 Module 5: Frontend Design System & Layout</h3>
+        <p>Viết lại toàn bộ CSS và tạo layout chính (Sidebar + Main Content) cho Nature Minimal theme.</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Mô tả</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">web-demo/src/index.css</span></td>
+                    <td><span class="badge badge-rewrite">REWRITE</span></td>
+                    <td>Toàn bộ design system mới: CSS variables, layout grid, component styles</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/App.jsx</span></td>
+                    <td><span class="badge badge-modify">MODIFY</span></td>
+                    <td>React Router v6 setup, layout wrapper (Sidebar + outlet)</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/Sidebar.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Sidebar navigation cố định bên trái</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/package.json</span></td>
+                    <td><span class="badge badge-modify">MODIFY</span></td>
+                    <td>Thêm: react-router-dom, recharts, firebase, date-fns, lucide-react</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>Cấu trúc Navigation</h4>
+        <div class="nav-diagram">
+            🌿 Emo Plant &nbsp;&nbsp;[Sidebar bên trái]<br>
+            ─────────────────────────<br>
+            📊 Tổng quan (Dashboard)<br>
+            📈 Biểu đồ chi tiết<br>
+            📷 Camera & AI<br>
+            📋 Lịch sử AI<br>
+            🔔 Thông báo <em>(badge count)</em><br>
+            ⚙️ Cài đặt<br>
+            ─────────────────────────<br>
+            👤 User Avatar (Google)<br>
+            🚪 Đăng xuất
+        </div>
+    </div>
+
+    <!-- Module 6 -->
+    <div class="module-card" id="module6">
+        <h3>📊 Module 6: Dashboard Page (Trang chính)</h3>
+        <p>Trang tổng quan hiển thị tất cả thông tin quan trọng trong 1 màn hình.</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Mô tả</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">web-demo/src/pages/DashboardPage.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Trang dashboard chính</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/SensorCard.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Card hiển thị 1 giá trị sensor</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/GaugeChart.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Ring/gauge chart cho độ ẩm và mực nước</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/QuickAction.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Nút "Tưới ngay" + "Chụp ảnh AI"</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Thành phần trên trang:</strong></p>
+        <ul>
+            <li><strong>Hero card:</strong> Tên cây + trạng thái tổng quát ("Cây đang khỏe mạnh" / "Cần chú ý")</li>
+            <li><strong>Sensor cards (grid 2×3):</strong>
+                <ul>
+                    <li>💧 Độ ẩm đất — gauge chart + giá trị %</li>
+                    <li>🌡️ Nhiệt độ — giá trị °C + icon xu hướng</li>
+                    <li>💨 Độ ẩm không khí — giá trị %</li>
+                    <li>☀️ Ánh sáng — giá trị lux + mô tả</li>
+                    <li>🚰 Mực nước bồn — bar gauge + % còn lại</li>
+                    <li>🔄 Lần tưới gần nhất — thời gian + loại</li>
+                </ul>
+            </li>
+            <li><strong>Mini chart:</strong> Sparkline 24h cho độ ẩm đất</li>
+            <li><strong>Quick actions:</strong> Nút "Tưới ngay" + "Chụp ảnh AI"</li>
+            <li><strong>Chẩn đoán gần nhất:</strong> Card kết quả AI lần cuối</li>
+        </ul>
+    </div>
+
+    <!-- Module 7 -->
+    <div class="module-card" id="module7">
+        <h3>📈 Module 7: Charts Page (Biểu đồ chi tiết)</h3>
+        <p>Trang biểu đồ full-size với bộ lọc thời gian, sử dụng Recharts.</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Mô tả</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">web-demo/src/pages/ChartsPage.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Trang biểu đồ chi tiết</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/SensorChart.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Wrapper component cho Recharts</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/TimeRangeFilter.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Bộ lọc thời gian dạng tab</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Các biểu đồ:</strong></p>
+        <ul>
+            <li>Độ ẩm đất (line) + ngưỡng tưới (dashed line)</li>
+            <li>Nhiệt độ (line chart)</li>
+            <li>Độ ẩm không khí (area chart)</li>
+            <li>Ánh sáng (area chart, filled)</li>
+            <li>Mực nước bồn (bar chart)</li>
+        </ul>
+        <p><strong>Bộ lọc:</strong> 1h | 6h | 24h | 7 ngày | 30 ngày</p>
+    </div>
+
+    <!-- Module 8 -->
+    <div class="module-card" id="module8">
+        <h3>📷 Module 8: Camera & AI Page</h3>
+        <p>Tích hợp live stream camera + AI chẩn đoán trên cùng 1 trang.</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Mô tả</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">web-demo/src/pages/CameraPage.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Trang Camera & AI chẩn đoán</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/LiveStreamViewer.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>MJPEG stream viewer (Phase 1: placeholder)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Tính năng:</strong></p>
+        <ul>
+            <li>Live stream panel — Phase 1 hiển thị placeholder, Phase 2 load MJPEG từ ESP32</li>
+            <li>Nút chụp ảnh → capture frame → gửi tới <span class="code">/api/diagnose</span></li>
+            <li>Upload ảnh thủ công (giữ tính năng cũ)</li>
+            <li>Kết quả AI hiển thị dưới dạng card đẹp</li>
+        </ul>
+    </div>
+
+    <!-- Module 9 -->
+    <div class="module-card" id="module9">
+        <h3>📋 Module 9: History Page (Lịch sử AI)</h3>
+        <p>Hiển thị timeline các lần chẩn đoán bệnh cây.</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Mô tả</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">web-demo/src/pages/HistoryPage.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Trang timeline lịch sử AI</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/DiagnosisCard.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Card trong timeline cho 1 lần chẩn đoán</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Tính năng:</strong></p>
+        <ul>
+            <li>Timeline dọc với thumbnail ảnh + tên bệnh + confidence + timestamp</li>
+            <li>Filter: Tất cả | Chỉ bệnh | Chỉ khỏe mạnh</li>
+            <li>Click vào entry → hiển thị modal chi tiết</li>
+        </ul>
+    </div>
+
+    <!-- Module 10 -->
+    <div class="module-card" id="module10">
+        <h3>🔔⚙️ Module 10: Alerts & Settings Pages</h3>
+        <p>Trang thông báo cảnh báo và trang cài đặt hệ thống.</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Mô tả</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">web-demo/src/pages/AlertsPage.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Danh sách cảnh báo + badge severity</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/pages/SettingsPage.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Cấu hình ngưỡng tưới, lịch chụp, cảnh báo</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/AlertCard.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Card hiển thị 1 cảnh báo</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/components/NotificationBadge.jsx</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Badge đếm thông báo chưa đọc trên sidebar</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Settings bao gồm:</strong></p>
+        <ul>
+            <li>Thông tin cây: Tên, loại, ảnh đại diện</li>
+            <li>Tưới tự động: Bật/tắt, ngưỡng tưới (slider %)</li>
+            <li>Lịch chụp ảnh AI: Tần suất (dropdown)</li>
+            <li>Cảnh báo: Bật/tắt từng loại, ngưỡng</li>
+            <li>Kết nối ESP32: Trạng thái, IP thiết bị</li>
+            <li>Tài khoản: Thông tin Google, nút đăng xuất</li>
+        </ul>
+    </div>
+
+    <!-- Module 11 -->
+    <div class="module-card" id="module11">
+        <h3>📲 Module 11: Firebase Cloud Messaging</h3>
+        <p>Push notification lên trình duyệt/điện thoại khi có cảnh báo.</p>
+
+        <table>
+            <thead><tr><th>File</th><th>Trạng thái</th><th>Mô tả</th></tr></thead>
+            <tbody>
+                <tr>
+                    <td><span class="code">web-demo/public/firebase-messaging-sw.js</span></td>
+                    <td><span class="badge badge-new">NEW</span></td>
+                    <td>Service Worker nhận push khi tab không active</td>
+                </tr>
+                <tr>
+                    <td><span class="code">web-demo/src/firebase.js</span></td>
+                    <td><span class="badge badge-modify">MODIFY</span></td>
+                    <td>Thêm FCM messaging instance + token registration</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr>
+
+    <!-- Phase 2 -->
+    <div class="phase-header" id="phase2">
+        <h2>Phase 2 — ESP32-CAM Integration</h2>
+        <p>Kết nối phần cứng thật sau khi Phase 1 hoàn thành và ổn định.</p>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>Phase 2 sẽ thực hiện sau khi Phase 1 test ổn định. Bao gồm:</strong>
+        <ul>
+            <li><strong>ESP32 Firmware (Arduino/PlatformIO):</strong> MJPEG streaming server, HTTP POST sensor data mỗi 30s, nhận lệnh tưới, chụp ảnh theo lịch</li>
+            <li><strong>Phần cứng mở rộng:</strong> Thêm DHT22 (nhiệt độ/độ ẩm), BH1750 (ánh sáng), Water Level Sensor vào mạch</li>
+            <li><strong>Backend updates:</strong> Thay mock bằng data thật, FCM push khi alert, proxy MJPEG stream</li>
+        </ul>
+    </div>
+
+    <!-- File Tree -->
+    <h2 id="file-tree">Cấu trúc thư mục cuối cùng (sau Phase 1)</h2>
+
+    <div class="file-tree">
+        <span class="folder">Emo-Plant-Smart-Planter/</span><br>
+        ├── <span class="folder">backend/</span><br>
+        │&nbsp;&nbsp; ├── <span class="modify">main.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── MODIFY: App entry + routers<br>
+        │&nbsp;&nbsp; ├── <span class="new">database.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW: SQLAlchemy setup<br>
+        │&nbsp;&nbsp; ├── <span class="new">models.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW: DB models<br>
+        │&nbsp;&nbsp; ├── <span class="new">firebase_auth.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW: Auth middleware<br>
+        │&nbsp;&nbsp; ├── <span class="new">mock_generator.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW: Fake sensor data<br>
+        │&nbsp;&nbsp; ├── <span class="keep">ai_model.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── KEEP: AI prediction<br>
+        │&nbsp;&nbsp; ├── <span class="modify">requirements.txt</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── MODIFY<br>
+        │&nbsp;&nbsp; ├── <span class="folder">routers/</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">sensor.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">diagnosis.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">control.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">alerts.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; └── <span class="new">settings.py</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; ├── <span class="new">uploads/</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW: Thư mục lưu ảnh AI<br>
+        │&nbsp;&nbsp; └── <span class="new">plant_data.db</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW: SQLite database<br>
+        │<br>
+        ├── <span class="folder">web-demo/</span><br>
+        │&nbsp;&nbsp; ├── <span class="folder">src/</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="modify">App.jsx</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── MODIFY: Router + layout<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="rewrite">index.css</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── REWRITE: Nature Minimal theme<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">firebase.js</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="folder">pages/</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">LoginPage.jsx</span> &nbsp;&nbsp;&nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">DashboardPage.jsx</span>&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">ChartsPage.jsx</span> &nbsp;&nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">CameraPage.jsx</span> &nbsp;&nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">HistoryPage.jsx</span> &nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; │&nbsp;&nbsp; ├── <span class="new">AlertsPage.jsx</span> &nbsp;&nbsp;&nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; │&nbsp;&nbsp; └── <span class="new">SettingsPage.jsx</span> &nbsp;&lt;── NEW<br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; └── <span class="folder">components/</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="new">Sidebar.jsx</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="new">SensorCard.jsx</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="new">GaugeChart.jsx</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="new">SensorChart.jsx</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="new">TimeRangeFilter.jsx</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="new">DiagnosisCard.jsx</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="new">AlertCard.jsx</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="new">LiveStreamViewer.jsx</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="new">QuickAction.jsx</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ├── <span class="new">ProtectedRoute.jsx</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; └── <span class="new">NotificationBadge.jsx</span><br>
+        │&nbsp;&nbsp; ├── <span class="folder">public/</span><br>
+        │&nbsp;&nbsp; │&nbsp;&nbsp; └── <span class="new">firebase-messaging-sw.js</span><br>
+        │&nbsp;&nbsp; └── <span class="modify">package.json</span><br>
+        │<br>
+        └── <span class="folder">docs/</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="keep">smart_planter_ai_context.md</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="keep">AI_Training_Plan.html</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;└── <span class="new">Web_Dashboard_Plan.html</span> &lt;── File này!<br>
+    </div>
+
+    <!-- Verification -->
+    <h2 id="verification">Kế hoạch kiểm thử</h2>
+
+    <h3>✅ Automated Tests</h3>
+    <ul>
+        <li><strong>Backend API tests:</strong>
+            <pre>pip install pytest httpx
+pytest backend/tests/ -v</pre>
+            Test CRUD cho mỗi router, mock data generator, Firebase Auth middleware.
+        </li>
+        <li><strong>Frontend build test:</strong>
+            <pre>cd web-demo
+npm run build</pre>
+            Verify build thành công, không warning.
+        </li>
+    </ul>
+
+    <h3>🔍 Manual Verification Checklist</h3>
+    <ul class="checklist">
+        <li>Login bằng Google account thành công</li>
+        <li>Dashboard hiển thị đúng mock data realtime</li>
+        <li>Navigate qua tất cả 6 trang không lỗi</li>
+        <li>Biểu đồ hiển thị đúng dữ liệu theo bộ lọc thời gian</li>
+        <li>Upload ảnh lá → AI trả kết quả đúng</li>
+        <li>Lịch sử AI hiển thị timeline chính xác</li>
+        <li>Cảnh báo hiển thị đúng severity và badge count</li>
+        <li>Cài đặt lưu và phản ánh đúng trên Dashboard</li>
+        <li>Bấm "Tưới ngay" → xem response và ghi lịch sử</li>
+        <li>Responsive trên mobile viewport (nếu áp dụng)</li>
+    </ul>
+
+    <footer>
+        <p>📅 Tạo ngày: 03/06/2026 | 🌿 Emo Plant — Smart Planter AI | 📌 Phase 1: Mock Data First</p>
+    </footer>
+
+</body>
+</html>

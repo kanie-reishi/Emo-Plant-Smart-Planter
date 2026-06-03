@@ -4,6 +4,11 @@ dataset/
 *.zip
 *.h5
 *.keras
+*.pth
+
+# Database & Uploads
+*.db
+backend/uploads/
 
 # Python
 __pycache__/

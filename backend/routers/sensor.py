@@ -65,12 +65,29 @@ def get_sensor_history(
         "24h",
         description="Time range: 1h, 6h, 24h, 7d, 30d",
     ),
+    date: Optional[str] = Query(None, description="Specific date YYYY-MM-DD"),
     db: Session = Depends(get_db),
 ):
     """
     Return sensor readings within the specified time range.
     Used by Charts page to render line/area graphs.
     """
+    if date:
+        try:
+            target_date = datetime.strptime(date, "%Y-%m-%d").date()
+            start_dt = datetime.combine(target_date, datetime.min.time()).replace(tzinfo=timezone.utc)
+            end_dt = datetime.combine(target_date, datetime.max.time()).replace(tzinfo=timezone.utc)
+            
+            readings = (
+                db.query(SensorReading)
+                .filter(SensorReading.timestamp >= start_dt, SensorReading.timestamp <= end_dt)
+                .order_by(SensorReading.timestamp.asc())
+                .all()
+            )
+            return [r.to_dict() for r in readings]
+        except ValueError:
+            pass # fallback to range logic if parsing fails
+
     now = datetime.now(timezone.utc)
 
     range_map = {

@@ -18,8 +18,8 @@ const api = axios.create({
 export const fetchLatestSensor = () =>
   api.get('/api/sensor/latest').then((r) => r.data);
 
-export const fetchSensorHistory = (range = '24h') =>
-  api.get('/api/sensor/history', { params: { range } }).then((r) => r.data);
+export const fetchSensorHistory = (range = '24h', date = null) =>
+  api.get('/api/sensor/history', { params: { range, date } }).then((r) => r.data);
 
 // ─── AI Diagnosis ──────────────────────────────────────────────────
 export const submitDiagnosis = (imageFile) => {

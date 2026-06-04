@@ -56,7 +56,7 @@ def load_model():
     Hàm nạp mô hình PyTorch vào bộ nhớ. Nếu chưa có file weights thì dùng Mock mode.
     """
     if os.path.exists(MODEL_PATH):
-        print(f"🚀 Đang tải AI Model PyTorch từ {MODEL_PATH}...")
+        print(f"[*] Dang tai AI Model PyTorch tu {MODEL_PATH}...")
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         model = models.mobilenet_v2()
         model.classifier[1] = nn.Linear(model.last_channel, 38)
@@ -65,7 +65,7 @@ def load_model():
         model.to(device)
         return {"type": "pytorch", "model": model, "device": device}
     else:
-        print("⚠️ Không tìm thấy file model trọng số (.pth). Đang chạy Mock Mode...")
+        print("[!] Khong tim thay file model trong so (.pth). Dang chay Mock Mode...")
         return {"type": "mock"}
 
 def predict_image(model_info: dict, image_bytes: bytes) -> dict:
@@ -128,7 +128,7 @@ def predict_image(model_info: dict, image_bytes: bytes) -> dict:
             }
             
     except Exception as e:
-        print(f"❌ Lỗi xử lý ảnh AI: {e}")
+        print(f"[X] Loi xu ly anh AI: {e}")
         return {
             "disease": "Lỗi phân tích",
             "confidence": 0.0,

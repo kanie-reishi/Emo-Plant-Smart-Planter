@@ -23,3 +23,10 @@ env/
 .vscode/
 .idea/
 .DS_Store
+
+# Node
+node_modules/
+dist/
+
+# Firebase & Secrets
+firebase-service-account.json

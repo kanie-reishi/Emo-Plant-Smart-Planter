@@ -9,6 +9,7 @@ from sqlalchemy import desc, func
 
 from database import get_db
 from models import Alert
+from firebase_admin_init import send_push_notification
 
 router = APIRouter(prefix="/api/alerts", tags=["Alerts"])
 

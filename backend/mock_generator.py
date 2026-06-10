@@ -24,9 +24,11 @@ import sys
 from datetime import datetime, timezone
 
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 
 from database import SessionLocal, init_db
 from models import SensorReading, Alert, WateringHistory, PlantSettings
+from firebase_admin_init import send_push_notification
 
 
 # --- Configuration ---
@@ -101,11 +103,12 @@ class MockState:
         self.water_level = max(0.0, self.water_level - random.uniform(3.0, 8.0))
         return moisture_before, self.soil_moisture
 
-
 def check_and_create_alerts(db: Session, reading: SensorReading, settings: PlantSettings):
     """Create alert records when sensor values cross thresholds."""
     if not settings.alert_enabled:
         return
+
+    alerts_generated = []
 
     # Low soil moisture
     if reading.soil_moisture < settings.moisture_threshold_low:
@@ -115,6 +118,7 @@ def check_and_create_alerts(db: Session, reading: SensorReading, settings: Plant
             severity="warning",
         )
         db.add(alert)
+        alerts_generated.append(alert)
 
     # Low water level
     if reading.water_level < 15.0:
@@ -124,6 +128,7 @@ def check_and_create_alerts(db: Session, reading: SensorReading, settings: Plant
             severity="critical",
         )
         db.add(alert)
+        alerts_generated.append(alert)
 
     # High temperature
     if reading.temperature > 38.0:
@@ -133,8 +138,24 @@ def check_and_create_alerts(db: Session, reading: SensorReading, settings: Plant
             severity="warning",
         )
         db.add(alert)
+        alerts_generated.append(alert)
 
-    db.commit()
+    if alerts_generated:
+        db.commit()
+        # If any alerts were generated, send push notifications
+        try:
+            tokens = db.execute(text("SELECT fcm_token FROM user_tokens")).fetchall()
+            for t in tokens:
+                for a in alerts_generated:
+                    send_push_notification(
+                        token=t[0],
+                        title="Cảnh báo Emo Plant",
+                        body=a.message,
+                        data={"type": a.alert_type, "severity": a.severity}
+                    )
+        except Exception as e:
+            # Table might not exist yet if frontend hasn't logged in
+            print(f"Failed to fetch tokens or send push: {e}")
 
 
 def run_generator():

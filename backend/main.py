@@ -9,12 +9,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from firebase_admin_init import init_firebase
 
 from ai_model import load_model, predict_image
 from database import init_db
 
-# Import routers
-from routers import sensor, diagnosis, control, alerts, settings
+from routers import sensor, diagnosis, control, alerts, settings, auth, hardware
 
 import os
 import uvicorn
@@ -33,6 +33,7 @@ async def lifespan(app: FastAPI):
     # --- Startup ---
     # Initialize database tables
     init_db()
+    init_firebase()
 
     # Load AI model once and inject into the diagnosis router
     ai_model = load_model()
@@ -72,8 +73,10 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 app.include_router(sensor.router)
 app.include_router(diagnosis.router)
 app.include_router(control.router)
-app.include_router(alerts.router)
+app.include_router(alerts.router, prefix="/api/alerts", tags=["Alerts"])
 app.include_router(settings.router)
+app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
+app.include_router(hardware.router, prefix="/api/hardware", tags=["Hardware"])
 
 
 # --- Legacy endpoints (kept for backward compatibility) ---

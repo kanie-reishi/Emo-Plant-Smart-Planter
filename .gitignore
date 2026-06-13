@@ -31,3 +31,6 @@ dist/
 # Firebase & Secrets
 firebase-service-account.json
 firebase.md
+
+# Flutter App
+emo_plant_app/

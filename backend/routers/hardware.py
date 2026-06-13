@@ -12,6 +12,21 @@ from ai_model import predict_image
 
 router = APIRouter()
 
+# --- SECURITY ---
+# Trong hệ thống thực tế, nên đưa HARDWARE_SECRET_KEY vào biến môi trường (.env)
+HARDWARE_SECRET_KEY = os.environ.get("HARDWARE_SECRET_KEY", "EmoPlant_ESP32_SecretKey_2026")
+
+def verify_hardware_token(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid Authorization header")
+    
+    token = auth_header.split(" ")[1]
+    if token != HARDWARE_SECRET_KEY:
+        raise HTTPException(status_code=403, detail="Invalid Hardware Token")
+    return True
+# ----------------
+
 class TelemetryData(BaseModel):
     temperature: float
     humidity: float
@@ -20,7 +35,7 @@ class TelemetryData(BaseModel):
     water_level: float
 
 @router.post("/telemetry", summary="Nhận dữ liệu từ ESP32 Sensor Node")
-def receive_telemetry(data: TelemetryData, db: Session = Depends(get_db)):
+def receive_telemetry(data: TelemetryData, db: Session = Depends(get_db), authorized: bool = Depends(verify_hardware_token)):
     """
     ESP32 Sensor Node gọi API này để gửi dữ liệu cảm biến.
     Trả về cấu hình hiện tại và lệnh đóng/cắt bơm nếu cần.
@@ -61,7 +76,7 @@ def receive_telemetry(data: TelemetryData, db: Session = Depends(get_db)):
     }
 
 @router.post("/camera", summary="Nhận ảnh từ ESP32-CAM")
-async def receive_camera_image(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db)):
+async def receive_camera_image(request: Request, file: UploadFile = File(...), db: Session = Depends(get_db), authorized: bool = Depends(verify_hardware_token)):
     """
     ESP32-CAM gửi ảnh qua dạng Multipart form-data.
     Lưu ảnh và gọi AI phân tích.

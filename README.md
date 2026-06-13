@@ -107,10 +107,51 @@ Nếu Terminal in ra `🚀 Khởi động Backend API Server tại http://localh
 
 ---
 
+## 📱 Phần 3: Cài đặt và chạy Mobile Companion App (Flutter)
+
+Ứng dụng di động được viết bằng **Flutter** và quản lý trạng thái bằng **Riverpod**.
+
+### 1. Yêu cầu hệ thống
+* Đã cài đặt **Flutter SDK** (bản mới nhất).
+* Điện thoại Android/iOS thật hoặc máy ảo (Emulator).
+
+### 2. Khởi chạy ứng dụng
+1. Di chuyển vào thư mục ứng dụng:
+   ```bash
+   cd emo_plant_app
+   ```
+2. Cài đặt các package Dart/Flutter:
+   ```bash
+   flutter pub get
+   ```
+3. Chạy ứng dụng trên máy ảo/thiết bị thật:
+   ```bash
+   flutter run
+   ```
+* Lưu ý: Mặc định `BASE_URL` của API được cấu hình trong [constants.dart](file:///E:/Projects/Emo%20Plant/Emo-Plant-Smart-Planter/emo_plant_app/lib/config/constants.dart). Bạn có thể đổi sang IP LAN của máy tính khi chạy bằng điện thoại thật.
+
+---
+
+## 🔌 Phần 4: Firmware ESP32 & ESP32-CAM
+
+Mã nguồn nhúng chạy trên nền tảng **PlatformIO (VS Code)**.
+
+### 1. Cấu trúc
+* **`esp32_firmware/camera_node/`**: Mạch ESP32-CAM chuyên chụp ảnh lá gửi lên backend chẩn đoán AI.
+* **`esp32_firmware/sensor_node/`**: Mạch ESP32 thông thường thu thập thông số cảm biến đất, không khí và điều khiển Relay máy bơm.
+
+### 2. Cài đặt & Flash mạch
+1. Mở thư mục node tương ứng trong VS Code (đã cài extension **PlatformIO IDE**).
+2. Tạo file `config.h` từ file mẫu `config.example.h` trong thư mục `src/`.
+3. Cập nhật tên WiFi, mật khẩu và IP backend của bạn trong file `config.h` mới tạo.
+4. Nhấn nút **Build** và **Upload** trên thanh công cụ PlatformIO để nạp code cho mạch.
+
+---
+
 ## 🚀 Cách Test Thử (Workflow)
-Để team có thể test luồng đầy đủ từ giao diện đến AI:
-1. Mở 2 Tab Terminal song song trong VS Code.
-2. **Terminal 1:** Chạy thư mục `web-demo` bằng lệnh `npm run dev`.
-3. **Terminal 2:** Chạy thư mục `backend` bằng lệnh `python main.py`.
-4. Mở trình duyệt vào trang Web Demo (`http://localhost:5173`).
-5. Tải lên một bức ảnh cây trồng (như lá cà chua đốm, lá táo bệnh) và nhấn "Phân tích". Web sẽ gọi API sang cổng `8000` của Backend để AI xử lý và trả kết quả siêu tốc!
+Để team có thể test luồng đầy đủ từ thiết bị, di động đến AI:
+1. Chạy FastAPI backend trong thư mục `backend`.
+2. Khởi chạy ứng dụng Web Demo (`web-demo`) hoặc Mobile App (`emo_plant_app`).
+3. Khởi chạy mạch ESP32 (hoặc chạy file giả lập `backend/mock_generator.py`).
+4. Các chỉ số cảm biến và ảnh chụp chẩn đoán sẽ tự động đồng bộ thời gian thực lên Dashboard Web/Mobile!
+

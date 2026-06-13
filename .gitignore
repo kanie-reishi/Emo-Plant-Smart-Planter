@@ -32,5 +32,11 @@ dist/
 firebase-service-account.json
 firebase.md
 
-# Flutter App
-emo_plant_app/
+# Flutter App build artifacts (not the entire code)
+# (Mã nguồn chính được theo dõi qua .gitignore nội bộ của thư mục emo_plant_app/)
+
+# ESP32 sensitive configuration files
+esp32_firmware/camera_node/src/config.h
+esp32_firmware/sensor_node/src/config.h
+esp32_firmware/camera_node/.pio
+esp32_firmware/sensor_node/.pio

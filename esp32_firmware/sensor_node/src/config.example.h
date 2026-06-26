@@ -22,6 +22,15 @@ const char* API_KEY = "YOUR_HARDWARE_SECRET_KEY";
 
 #define PUMP_RELAY_PIN 23
 
+// --- TFT LCD Configuration (Circular GC9A01, HSPI on Left Side) ---
+// Standard ESP32 HSPI Pins: MOSI=13, SCLK=14
+#define TFT_MOSI 13
+#define TFT_SCLK 14
+#define TFT_CS   25
+#define TFT_DC   26
+#define TFT_RST  27
+
+
 // --- Timing ---
 const unsigned long TELEMETRY_INTERVAL = 30000; // 30 seconds
 
